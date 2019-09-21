@@ -128,17 +128,49 @@ app.get('/api/owners/:id/pets/:petId', function(req, res, next){
         res.send(petsArray[req.params.id - 1][req.params.petId -1])
     }
     // if(!pet) res.status(404).send('not the right pet id');
-    
-    
-
 })
 
 // POST /api/owners/:id/pets
+app.post('/api/owners/:id/pets', function(req, res, next){
+    const owner = owners.find(item => item.id === parseInt(req.params.id));
+    if(!owner) res.status(404).send('not the right owner');
+   
+    // console.log(owner.pets, owner.pets.length, 'secondpart ',  req.body.name)
+
+    const ownersPet ={
+                id: owner.pets.length + 1,
+                name: req.body.name,
+                type: req.body.type
+            };
+        
+    // console.log(req.body.pets.name)
+    owners[req.params.id - 1].pets.push(ownersPet);
+    res.send(ownersPet)
+
+})
 
 // PUT /api/owners/:id/pets/:petId
+app.put('/api/owners/:id/pets/:petId', function(req, res, next){
+    const owner = owners.find(item => item.id === parseInt(req.params.id));
+    if(!owner) res.status(400).send('owner not identified')
+
+    console.log(owner.pets)
+    owner.pets[req.params.petId - 1].name = req.body.name;
+    owner.pets[req.params.petId - 1].type = req.body.type;
+    res.send(owner);
+
+})
 
 // DELETE /api/owners/:id/pets/:petId
+app.delete('/api/owners/:id/pets/:petId', function(req, res, next){
+    const owner = owners.find(item => item.id === parseInt(req.params.id));
+    if(!owner) res.status(400).send('owner not correct');
 
+    index = req.params.petId - 1;
+
+    owner.pets.splice(index, 1);
+    res.send(owner)
+})
 
 app.listen(3000, function(){
     console.log('Pets API is now listening on port 3000...');
