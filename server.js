@@ -5,6 +5,7 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+
 var owners = [
     {
         id: 1,
@@ -37,18 +38,100 @@ var owners = [
 
 
 // GET /api/owners
-
+app.get('/api/owners',  function(req, res, next){
+    res.send(owners)
+})
 // GET /api/owners/:id
+app.get('/api/owners/:id', function(req, res, next){
+    const owner = owners.find(item => item.id === parseInt(req.params.id))
+    if(!owner)res.status(404).send('item not found');
+    res.send(owner);
+})
 
 // POST /api/owners
+app.post('/api/owners', function(req, res, next){
+    
+   
+   
+    const owner = {
+        id: owners.length + 1,
+        name: req.body.name
+        // ,pets: [
+        //     {
+        //         id: 1,
+        //         name: req.body.pets.name,
+        //         type: req.body.pets.type
+        //     }
+        // ]
+    };
+    // console.log(req.body.pets.name)
+    owners.push(owner);
+    res.send(owner)
+
+})
 
 // PUT /api/owners/:id
+app.put('/api/owners/:id', function(req, res, next){
+    const owner = owners.find(item => item.id === parseInt(req.params.id));
+    if(!owner) res.status(400).send("Owner not found");
+
+    owner.name = req.body.name;
+    res.send(owner)
+
+
+})
 
 // DELETE /api/owners/:id
+app.delete('/api/owners/:id', function(req, res, next){
+    const owner = owners.find(item => item.id === parseInt(req.params.id));
+    if(!owner) res.status(400).send("Owner not found");
+
+    index = owners.indexOf(owner);
+    owners.splice(index, 1);
+    res.send(owner);
+})
 
 // GET /api/owners/:id/pets
+app.get('/api/owners/:id/pets', function(req, res, next){
+    const owner = owners.find(item => item.id === parseInt(req.params.id));
+    if(!owner) res.status(404).send('not the right owner');
+    
+    // var petsArray = [];
+    // for(var i = 0; i < owners.length; i++){
+    //     var mapped = owners[i].pets.map(mapPets);
+    //     function mapPets(pets){
+    //         petsArray.push(pets)
+    //     }
+       
+    // }
+    // console.log(petsArray)
+    
+    res.send(owner.pets)
+})
 
 // GET /api/owners/:id/pets/:petId
+app.get('/api/owners/:id/pets/:petId', function(req, res, next){
+    const owner = owners.find(item => item.id === parseInt(req.params.id));
+    if(!owner) res.status(404).send('not the right owner');
+
+    var petsArray = [];
+    for(var i = 0; i < owners.length; i++){
+        var mapped = owners[i].pets.map(mapPets);
+        function mapPets(pets){
+            return pets
+        }
+        petsArray.push(mapped)
+    }
+    
+
+    if(petsArray[req.params.id - 1][req.params.petId -1].id === parseInt(req.params.petId)){
+        res.send(petsArray[req.params.id - 1][req.params.petId -1])
+    }
+    // if(!pet) res.status(404).send('not the right pet id');
+    
+    
+
+})
 
 // POST /api/owners/:id/pets
 
